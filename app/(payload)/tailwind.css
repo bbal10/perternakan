@@ -1,0 +1,96 @@
+/**
+ * Tailwind CSS 4 for Payload Admin
+ * - Skip preflight/base so Payload default styles stay intact
+ * - Utilities + theme only (official Payload approach)
+ * @see https://payloadcms.com/posts/guides/how-to-theme-the-payload-admin-panel-with-tailwind-css-4
+ */
+
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+/* DO NOT import preflight — resets break Payload buttons/forms */
+/* @import 'tailwindcss/preflight.css' layer(base); */
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* Scan admin components so utility classes are generated */
+@source "../../src/components/admin/**/*.{tsx,ts,jsx,js}";
+
+/* Brand tokens shared with frontend Organic Biophilic design */
+@theme {
+  --color-farm-primary: #15803d;
+  --color-farm-primary-hover: #166534;
+  --color-farm-primary-soft: #dcfce7;
+  --color-farm-secondary: #22c55e;
+  --color-farm-cta: #ca8a04;
+  --color-farm-cta-hover: #a16207;
+  --color-farm-cta-soft: #fef9c3;
+  --color-farm-bg: #f0fdf4;
+  --color-farm-surface: #ffffff;
+  --color-farm-text: #14532d;
+  --color-farm-muted: #3f6212;
+  --color-farm-border: #bbf7d0;
+  --color-farm-border-strong: #86efac;
+  --color-farm-danger: #b91c1c;
+
+  --font-farm-sans: 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-farm-mono: 'Fira Code', ui-monospace, monospace;
+
+  --radius-farm: 1rem;
+  --radius-farm-lg: 1.25rem;
+}
+
+/* Optional helper classes for admin custom components */
+@layer components {
+  .farm-card {
+    border: 1px solid var(--color-farm-border);
+    border-radius: var(--radius-farm-lg);
+    background: var(--color-farm-surface);
+    box-shadow: 0 1px 2px rgb(20 83 45 / 0.06);
+  }
+
+  .farm-btn-primary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    cursor: pointer;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    background: var(--color-farm-primary);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 150ms ease;
+  }
+
+  .farm-btn-primary:hover {
+    background: var(--color-farm-primary-hover);
+    color: #fff;
+  }
+
+  .farm-btn-ghost {
+    display: inline-flex;
+    min-height: 2.75rem;
+    cursor: pointer;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-farm-border);
+    background: var(--color-farm-surface);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-farm-text);
+    text-decoration: none;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .farm-btn-ghost:hover {
+    border-color: var(--color-farm-border-strong);
+    background: var(--color-farm-primary-soft);
+    color: var(--color-farm-primary);
+  }
+}

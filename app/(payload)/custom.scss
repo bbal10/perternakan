@@ -1,0 +1,327 @@
+/**
+ * Payload Admin — Organic Biophilic overhaul
+ * Matches frontend dashboard: #15803D / #F0FDF4 / #14532D / #CA8A04
+ */
+
+@layer payload {
+  :root {
+    --color-base-0: rgb(255, 255, 255);
+    --color-base-50: rgb(240, 253, 244);
+    --color-base-100: rgb(220, 252, 231);
+    --color-base-150: rgb(187, 247, 208);
+    --color-base-200: rgb(167, 243, 208);
+    --color-base-250: rgb(134, 239, 172);
+    --color-base-300: rgb(110, 231, 183);
+    --color-base-350: rgb(74, 222, 128);
+    --color-base-400: rgb(74, 160, 90);
+    --color-base-450: rgb(63, 140, 75);
+    --color-base-500: rgb(52, 120, 65);
+    --color-base-550: rgb(45, 105, 58);
+    --color-base-600: rgb(34, 90, 48);
+    --color-base-650: rgb(30, 80, 42);
+    --color-base-700: rgb(26, 70, 38);
+    --color-base-750: rgb(22, 60, 34);
+    --color-base-800: rgb(20, 83, 45);
+    --color-base-850: rgb(16, 68, 36);
+    --color-base-900: rgb(12, 52, 28);
+    --color-base-950: rgb(8, 36, 20);
+    --color-base-1000: rgb(5, 24, 14);
+
+    --color-success-50: rgb(240, 253, 244);
+    --color-success-100: rgb(220, 252, 231);
+    --color-success-150: rgb(187, 247, 208);
+    --color-success-200: rgb(134, 239, 172);
+    --color-success-250: rgb(74, 222, 128);
+    --color-success-300: rgb(34, 197, 94);
+    --color-success-350: rgb(22, 163, 74);
+    --color-success-400: rgb(21, 140, 65);
+    --color-success-450: rgb(21, 128, 61);
+    --color-success-500: rgb(21, 128, 61);
+    --color-success-550: rgb(20, 115, 55);
+    --color-success-600: rgb(22, 101, 52);
+    --color-success-650: rgb(21, 90, 48);
+    --color-success-700: rgb(20, 83, 45);
+    --color-success-750: rgb(18, 72, 40);
+    --color-success-800: rgb(16, 60, 34);
+    --color-success-850: rgb(14, 50, 28);
+    --color-success-900: rgb(12, 40, 22);
+    --color-success-950: rgb(8, 28, 16);
+
+    --color-warning-50: rgb(254, 249, 195);
+    --color-warning-100: rgb(254, 240, 138);
+    --color-warning-150: rgb(253, 224, 71);
+    --color-warning-200: rgb(250, 204, 21);
+    --color-warning-250: rgb(234, 179, 8);
+    --color-warning-300: rgb(202, 138, 4);
+    --color-warning-350: rgb(180, 120, 8);
+    --color-warning-400: rgb(161, 98, 7);
+    --color-warning-450: rgb(146, 88, 8);
+    --color-warning-500: rgb(133, 77, 14);
+    --color-warning-550: rgb(120, 70, 13);
+    --color-warning-600: rgb(105, 61, 13);
+    --color-warning-650: rgb(90, 55, 14);
+    --color-warning-700: rgb(78, 48, 14);
+    --color-warning-750: rgb(66, 42, 14);
+    --color-warning-800: rgb(54, 36, 14);
+    --color-warning-850: rgb(44, 30, 14);
+    --color-warning-900: rgb(34, 24, 12);
+    --color-warning-950: rgb(24, 18, 10);
+
+    --style-radius-s: 8px;
+    --style-radius-m: 12px;
+    --style-radius-l: 16px;
+
+    --font-body:
+      'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+      sans-serif;
+    --font-mono: 'Fira Code', 'SF Mono', Menlo, Consolas, Monaco, monospace;
+  }
+
+  html[data-theme='light'],
+  html:not([data-theme='dark']) {
+    --theme-bg: var(--color-base-50);
+    --theme-input-bg: var(--color-base-0);
+    --theme-text: var(--color-base-800);
+  }
+
+  /* —— Shell —— */
+  .template-default__wrap {
+    background:
+      radial-gradient(ellipse 80% 45% at 0% -5%, rgb(34 197 94 / 0.12), transparent 55%),
+      radial-gradient(ellipse 50% 35% at 100% 0%, rgb(202 138 4 / 0.08), transparent 50%),
+      var(--theme-bg);
+  }
+
+  .app-header {
+    border-bottom: 1px solid var(--color-base-150);
+    backdrop-filter: blur(10px);
+  }
+
+  .app-header__bg {
+    background: rgb(255 255 255 / 0.88) !important;
+  }
+
+  /* —— Nav —— */
+  .nav {
+    border-right: 1px solid var(--color-base-150);
+    background: rgb(255 255 255 / 0.72);
+  }
+
+  .nav__header {
+    padding-bottom: 0.75rem;
+  }
+
+  .nav__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-base-500);
+  }
+
+  .nav__link {
+    border-radius: var(--style-radius-m);
+    transition:
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .nav__link:hover,
+  .nav__link:focus-visible {
+    background: var(--color-base-100);
+  }
+
+  .nav__link.active {
+    background: var(--color-base-100);
+    color: var(--color-success-600);
+    font-weight: 600;
+  }
+
+  .nav .farm-btn-primary {
+    color: #fff !important;
+    text-decoration: none !important;
+  }
+
+  .nav .farm-btn-ghost {
+    text-decoration: none !important;
+  }
+
+  .farm-nav-actions {
+    margin-top: 0.25rem;
+  }
+
+  /* —— Buttons —— */
+  .btn--style-primary {
+    background: var(--color-success-500);
+    border-color: var(--color-success-500);
+    color: #fff;
+    border-radius: var(--style-radius-m);
+    font-weight: 600;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .btn--style-primary:hover {
+    background: var(--color-success-600);
+    border-color: var(--color-success-600);
+  }
+
+  .btn--style-primary:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-base-50),
+      0 0 0 4px var(--color-success-500);
+  }
+
+  .btn--style-secondary,
+  .btn--style-pill {
+    border-radius: var(--style-radius-m);
+  }
+
+  /* —— Lists / cards / docs —— */
+  .collection-list,
+  .table,
+  .card,
+  .doc-header,
+  .render-fields,
+  .list-header,
+  .collection-list__wrap,
+  .document-fields {
+    border-radius: var(--style-radius-l);
+  }
+
+  .table thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    color: var(--color-base-550);
+  }
+
+  .table tbody tr {
+    transition: background-color 140ms ease;
+  }
+
+  .table tbody tr:hover {
+    background: var(--color-base-50);
+  }
+
+  .list-header {
+    margin-bottom: 1rem;
+  }
+
+  .list-header__title {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .doc-controls,
+  .doc-header {
+    border-radius: var(--style-radius-l);
+  }
+
+  /* Form fields more tactile */
+  .field-type input:not([type='checkbox']):not([type='radio']),
+  .field-type textarea,
+  .field-type .react-select__control,
+  .field-type select {
+    border-radius: var(--style-radius-m) !important;
+    border-color: var(--color-base-150) !important;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .field-type input:focus,
+  .field-type textarea:focus,
+  .field-type .react-select__control--is-focused {
+    border-color: var(--color-success-500) !important;
+    box-shadow: 0 0 0 3px rgb(21 128 61 / 0.15) !important;
+  }
+
+  .field-label {
+    font-weight: 600;
+    color: var(--color-base-800);
+  }
+
+  .field-description {
+    color: var(--color-base-500);
+  }
+
+  /* —— Login / first user —— */
+  .template-minimal {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgb(34 197 94 / 0.18), transparent 55%),
+      radial-gradient(ellipse 40% 30% at 100% 100%, rgb(202 138 4 / 0.1), transparent 45%),
+      var(--color-base-50);
+  }
+
+  .login,
+  .create-first-user {
+    max-width: 28rem;
+  }
+
+  .login__brand,
+  .create-first-user__brand {
+    margin-bottom: 1.75rem;
+  }
+
+  .login__form,
+  .create-first-user__form {
+    border-radius: var(--style-radius-l);
+    border: 1px solid var(--color-base-150);
+    background: #fff;
+    box-shadow: 0 12px 40px rgb(20 83 45 / 0.08);
+    padding: 1.5rem;
+  }
+
+  /* —— Step nav home icon (prevent clipping) —— */
+  .step-nav__home {
+    width: 28px !important;
+    height: 28px !important;
+    flex-shrink: 0;
+    overflow: visible;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step-nav__home .graphic-icon,
+  .step-nav__home svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 28px;
+    max-height: 28px;
+  }
+
+  @media (max-width: 1024px) {
+    .step-nav__home {
+      width: 24px !important;
+      height: 24px !important;
+    }
+
+    .step-nav__home .graphic-icon,
+    .step-nav__home svg {
+      max-width: 24px;
+      max-height: 24px;
+    }
+  }
+
+  /* Custom home spacing inside default template content */
+  .farm-admin-home {
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav__link,
+    .btn--style-primary,
+    .table tbody tr,
+    .farm-btn-primary,
+    .farm-btn-ghost {
+      transition: none !important;
+    }
+  }
+}

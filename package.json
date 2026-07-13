@@ -1,0 +1,43 @@
+{
+  "name": "perternakan",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "payload:generate": "payload generate:types",
+    "payload:migrate": "payload migrate",
+    "payload:migrate:create": "payload migrate:create",
+    "seed": "tsx src/seed.ts",
+    "docker:dev": "podman compose -f docker-compose.yml up --build",
+    "docker:dev:down": "podman compose -f docker-compose.yml down",
+    "docker:prod": "podman compose -f docker-compose.prod.yml --env-file .env.production.local up --build -d",
+    "docker:prod:down": "podman compose -f docker-compose.prod.yml --env-file .env.production.local down"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.85.2",
+    "@payloadcms/next": "^3.85.2",
+    "@payloadcms/richtext-lexical": "^3.85.2",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.23.0",
+    "next": "16.2.10",
+    "payload": "^3.85.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.9.2",
+    "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.0",
+    "typescript": "^5"
+  }
+}

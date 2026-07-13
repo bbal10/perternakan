@@ -1,0 +1,53 @@
+# Production stack (built image, no source mount, no schema push)
+# Usage:
+#   cp .env.example .env.production.local   # then fill real secrets
+#   podman compose -f docker-compose.prod.yml --env-file .env.production.local up --build -d
+#
+# First deploy (empty DB): either
+#   1) create + run Payload migrations, or
+#   2) one-shot: PAYLOAD_DATABASE_PUSH=true for a single start (not recommended long-term)
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-perternakan}
+    # Do not expose DB publicly in real prod; keep for single-host deploys if needed
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:3000}
+    restart: always
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET min 32 chars}
+      DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-perternakan}
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:3000}
+      # Production default: no auto push — use migrations
+      PAYLOAD_DATABASE_PUSH: ${PAYLOAD_DATABASE_PUSH:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media_uploads:/app/media
+
+volumes:
+  postgres_data_prod:
+  media_uploads:
