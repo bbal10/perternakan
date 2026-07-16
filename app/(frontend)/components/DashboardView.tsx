@@ -28,6 +28,7 @@ import {
   MonthlyFinanceChart,
 } from './DashboardCharts'
 import { LogoutButton } from './LogoutButton'
+import { ExportPanel } from './ExportPanel'
 import type { DashboardData } from '@/src/lib/dashboard'
 
 function formatMomTrend(value: number | null | undefined, label = 'vs bulan lalu') {
@@ -263,6 +264,10 @@ export function DashboardView({ data, displayName, email, isDev }: Props) {
           </div>
         </section>
 
+        <div className="mb-8">
+          <ExportPanel />
+        </div>
+
         <section aria-labelledby="kpi-heading" className="mb-8">
           <h2 id="kpi-heading" className="sr-only">
             Indikator utama
@@ -287,14 +292,6 @@ export function DashboardView({ data, displayName, email, isDev }: Props) {
               value={`${data.avgProductionRate}%`}
               icon={TrendingUp}
               tone="primary"
-            />
-            <StatCard
-              title="Saldo kas"
-              value={`Rp ${data.cashBalance.toLocaleString('id-ID')}`}
-              icon={Banknote}
-              trend={data.cashBalance >= 0 ? 'Positif' : 'Perlu perhatian'}
-              trendUp={data.cashBalance >= 0}
-              tone={data.cashBalance >= 0 ? 'primary' : 'danger'}
             />
             <StatCard
               title="Pendapatan bulan ini"
@@ -322,6 +319,98 @@ export function DashboardView({ data, displayName, email, isDev }: Props) {
               icon={Users}
               tone="muted"
             />
+          </div>
+
+          {/* Saldo terpisah: Cash · Transfer · Total */}
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <article className="card-surface relative overflow-hidden p-5">
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-secondary/15 to-transparent"
+                aria-hidden
+              />
+              <div className="relative flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                    Saldo cash
+                  </p>
+                  <p
+                    className={`mt-2 font-mono text-xl font-semibold tabular-nums tracking-tight sm:text-2xl ${
+                      data.cashBalanceCash >= 0 ? 'text-foreground' : 'text-danger'
+                    }`}
+                  >
+                    Rp {data.cashBalanceCash.toLocaleString('id-ID')}
+                  </p>
+                  <p className="mt-2 text-xs text-muted">Tunai di tangan</p>
+                </div>
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-muted"
+                  aria-hidden
+                >
+                  <Banknote className="h-5 w-5 text-muted" />
+                </div>
+              </div>
+            </article>
+
+            <article className="card-surface relative overflow-hidden p-5">
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-primary/10 to-transparent"
+                aria-hidden
+              />
+              <div className="relative flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                    Saldo transfer
+                  </p>
+                  <p
+                    className={`mt-2 font-mono text-xl font-semibold tabular-nums tracking-tight sm:text-2xl ${
+                      data.cashBalanceTransfer >= 0
+                        ? 'text-foreground'
+                        : 'text-danger'
+                    }`}
+                  >
+                    Rp {data.cashBalanceTransfer.toLocaleString('id-ID')}
+                  </p>
+                  <p className="mt-2 text-xs text-muted">Rekening / transfer</p>
+                </div>
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-soft"
+                  aria-hidden
+                >
+                  <PiggyBank className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+            </article>
+
+            <article className="card-surface relative overflow-hidden border-primary/25 p-5 ring-1 ring-primary/15">
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-cta/15 to-transparent"
+                aria-hidden
+              />
+              <div className="relative flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                    Total saldo
+                  </p>
+                  <p
+                    className={`mt-2 font-mono text-xl font-semibold tabular-nums tracking-tight sm:text-2xl ${
+                      data.cashBalance >= 0 ? 'text-foreground' : 'text-danger'
+                    }`}
+                  >
+                    Rp {data.cashBalance.toLocaleString('id-ID')}
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-muted">
+                    Cash + transfer
+                    {data.cashBalance >= 0 ? ' · Positif' : ' · Perlu perhatian'}
+                  </p>
+                </div>
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cta-soft"
+                  aria-hidden
+                >
+                  <Scale className="h-5 w-5 text-cta" />
+                </div>
+              </div>
+            </article>
           </div>
         </section>
 

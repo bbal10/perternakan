@@ -12,6 +12,8 @@ import { CashTransactions } from './src/collections/CashTransactions'
 import { OperationalExpenses } from './src/collections/OperationalExpenses'
 import { Media } from './src/collections/Media'
 import { Users } from './src/collections/Users'
+import { ExportJobs } from './src/collections/ExportJobs'
+import { exportDataTask } from './src/jobs/exportData'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -65,10 +67,30 @@ export default buildConfig({
     Customers,
     Media,
     Users,
+    ExportJobs,
   ],
   upload: {
     limits: {
-      fileSize: 5000000, // 5MB
+      fileSize: 10000000, // 10MB (exports can be larger than photo proofs)
+    },
+  },
+  // Background jobs — export CSV/XLSX without blocking the UI
+  jobs: {
+    tasks: [exportDataTask],
+    // Process queued jobs every minute (long-running Node / Docker)
+    autoRun: [
+      {
+        cron: '* * * * *',
+        limit: 10,
+        queue: 'exports',
+      },
+    ],
+    shouldAutoRun: async () => true,
+    deleteJobOnComplete: false,
+    access: {
+      // Authenticated users may queue/run their export jobs via API
+      queue: ({ req }) => !!req.user,
+      run: ({ req }) => !!req.user,
     },
   },
   db: postgresAdapter({

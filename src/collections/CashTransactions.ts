@@ -11,6 +11,11 @@ export const CashTransactions: CollectionConfig = {
     useAsTitle: 'keterangan',
     defaultColumns: ['tanggal', 'jenis', 'nominal', 'metode', 'sisaSaldo'],
     description: 'Uang masuk/keluar, metode bayar, dan bukti transfer.',
+    components: {
+      edit: {
+        SaveButton: '/src/components/admin/SaveButtonRedirectDashboard.tsx',
+      },
+    },
   },
   fields: [
     {

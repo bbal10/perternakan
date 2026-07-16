@@ -11,6 +11,11 @@ export const OperationalExpenses: CollectionConfig = {
     useAsTitle: 'kategori',
     defaultColumns: ['tanggal', 'kategori', 'qty', 'hargaNominal', 'satuan'],
     description: 'Pengeluaran pakan, vitamin, obat, listrik, dan air.',
+    components: {
+      edit: {
+        SaveButton: '/src/components/admin/SaveButtonRedirectDashboard.tsx',
+      },
+    },
   },
   fields: [
     {

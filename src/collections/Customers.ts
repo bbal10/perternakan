@@ -11,6 +11,11 @@ export const Customers: CollectionConfig = {
     useAsTitle: 'nama',
     defaultColumns: ['nama', 'kontak'],
     description: 'Daftar pelanggan dan kontak WhatsApp/HP.',
+    components: {
+      edit: {
+        SaveButton: '/src/components/admin/SaveButtonRedirectDashboard.tsx',
+      },
+    },
   },
   fields: [
     {

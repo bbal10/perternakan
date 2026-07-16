@@ -155,9 +155,22 @@ export default async function AdminHome(props: AdminViewServerProps) {
           hint: 'Dari penjualan',
         },
         {
-          label: 'Saldo kas',
+          label: 'Saldo cash',
+          value: `Rp ${stats.cashBalanceCash.toLocaleString('id-ID')}`,
+          hint: 'Tunai di tangan',
+        },
+        {
+          label: 'Saldo transfer',
+          value: `Rp ${stats.cashBalanceTransfer.toLocaleString('id-ID')}`,
+          hint: 'Rekening / transfer',
+        },
+        {
+          label: 'Total saldo',
           value: `Rp ${stats.cashBalance.toLocaleString('id-ID')}`,
-          hint: stats.cashBalance >= 0 ? 'Positif' : 'Perlu perhatian',
+          hint:
+            stats.cashBalance >= 0
+              ? 'Cash + transfer · Positif'
+              : 'Cash + transfer · Perlu perhatian',
         },
       ]
     : []
@@ -200,6 +213,9 @@ export default async function AdminHome(props: AdminViewServerProps) {
               <a href="/admin/collections/sales/create" className="farm-btn-ghost">
                 + Penjualan
               </a>
+              <a href="/#export-heading" className="farm-btn-ghost">
+                Export CSV/Excel
+              </a>
             </div>
           </div>
         </div>
@@ -212,7 +228,7 @@ export default async function AdminHome(props: AdminViewServerProps) {
             <h2 className="text-sm font-semibold text-farm-text">Ringkasan cepat</h2>
             <span className="text-xs text-farm-muted">Diambil saat halaman dibuka</span>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {kpis.map((kpi) => (
               <article
                 key={kpi.label}

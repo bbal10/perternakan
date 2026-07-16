@@ -1,3 +1,4 @@
+import { default as default_8e5386387dd930a402bd2fa58ac013d1 } from '../../../src/components/admin/SaveButtonRedirectDashboard.tsx'
 import { default as default_f393237726385f0e5352f60de752353e } from '../../../src/components/admin/Icon.tsx'
 import { default as default_7bc877c54546c53747221ab36387b2a7 } from '../../../src/components/admin/Logo.tsx'
 import { default as default_8f53ab32e75ec0cb3e6e6f5db8168928 } from '../../../src/components/admin/DashboardNavLink.tsx'
@@ -6,6 +7,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/src/components/admin/SaveButtonRedirectDashboard.tsx#default": default_8e5386387dd930a402bd2fa58ac013d1,
   "/src/components/admin/Icon.tsx#default": default_f393237726385f0e5352f60de752353e,
   "/src/components/admin/Logo.tsx#default": default_7bc877c54546c53747221ab36387b2a7,
   "/src/components/admin/DashboardNavLink.tsx#default": default_8f53ab32e75ec0cb3e6e6f5db8168928,

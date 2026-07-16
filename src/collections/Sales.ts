@@ -11,6 +11,11 @@ export const Sales: CollectionConfig = {
     useAsTitle: 'tanggal',
     defaultColumns: ['tanggal', 'customer', 'item', 'qty', 'subtotal'],
     description: 'Catat penjualan telur dan relasi pelanggan.',
+    components: {
+      edit: {
+        SaveButton: '/src/components/admin/SaveButtonRedirectDashboard.tsx',
+      },
+    },
   },
   fields: [
     {

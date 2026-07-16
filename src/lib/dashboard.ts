@@ -70,7 +70,12 @@ export type DashboardData = {
   avgProductionRate: number
   latestProductionRate: number
   monthlyRevenue: number
+  /** Saldo total (cash + transfer) */
   cashBalance: number
+  /** Saldo metode CASH saja */
+  cashBalanceCash: number
+  /** Saldo metode TRANSFER saja */
+  cashBalanceTransfer: number
   telurTerjualBulanIni: number
   kematianBulanIni: number
   customersCount: number
@@ -395,13 +400,19 @@ export async function getDashboardData(
         )
       : 0
 
-  const totalIn = cashAll
-    .filter((t) => t.jenis === 'MASUK')
-    .reduce((sum, t) => sum + (t.nominal || 0), 0)
-  const totalOut = cashAll
-    .filter((t) => t.jenis === 'KELUAR')
-    .reduce((sum, t) => sum + (t.nominal || 0), 0)
-  const cashBalance = totalIn - totalOut
+  // Saldo per metode pembayaran + total (all-time)
+  let cashBalanceCash = 0
+  let cashBalanceTransfer = 0
+  let cashBalanceOther = 0
+  for (const t of cashAll) {
+    const amount = t.nominal || 0
+    const signed =
+      t.jenis === 'MASUK' ? amount : t.jenis === 'KELUAR' ? -amount : 0
+    if (t.metode === 'CASH') cashBalanceCash += signed
+    else if (t.metode === 'TRANSFER') cashBalanceTransfer += signed
+    else cashBalanceOther += signed
+  }
+  const cashBalance = cashBalanceCash + cashBalanceTransfer + cashBalanceOther
 
   const monthlySeries = buildMonthlySeries(
     buckets,
@@ -530,6 +541,8 @@ export async function getDashboardData(
     latestProductionRate: latestProduction?.persentaseProduksi || 0,
     monthlyRevenue: currentMonthStats.pendapatan,
     cashBalance,
+    cashBalanceCash,
+    cashBalanceTransfer,
     telurTerjualBulanIni: currentMonthStats.telurTerjual,
     kematianBulanIni: currentMonthStats.kematian,
     customersCount: customers.length,

@@ -8,7 +8,16 @@ export const Media: CollectionConfig = {
   },
   upload: {
     staticDir: 'media',
-    mimeTypes: ['image/*', 'application/pdf'],
+    mimeTypes: [
+      'image/*',
+      'application/pdf',
+      // Export data (CSV / Excel)
+      'text/csv',
+      'text/plain',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'application/octet-stream',
+    ],
   },
   fields: [
     {

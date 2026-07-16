@@ -11,6 +11,12 @@ export const Productions: CollectionConfig = {
     useAsTitle: 'tanggal',
     defaultColumns: ['tanggal', 'jumlahItik', 'telurDiproduksi', 'persentaseProduksi', 'kematian'],
     description: 'Catat produksi telur harian, stok itik, dan kematian.',
+    components: {
+      edit: {
+        // Setelah create sukses → dashboard utama
+        SaveButton: '/src/components/admin/SaveButtonRedirectDashboard.tsx',
+      },
+    },
   },
   fields: [
     {
