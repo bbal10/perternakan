@@ -20,7 +20,11 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const isProd = process.env.NODE_ENV === 'production'
-const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+// Origin must match browser Origin exactly (no trailing slash) for CSRF/cookies.
+const serverURL = (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(
+  /\/$/,
+  '',
+)
 
 // Dev-only: drizzle push when NODE_ENV !== 'production'.
 // Payload hardcodes push OFF in production regardless of this flag
@@ -107,6 +111,8 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'src/migrations'),
   }),
   secret: payloadSecret || 'dev-only-secret-change-me-min-32-chars!!',
+  // Surface real API errors (e.g. login) when PAYLOAD_DEBUG=true — check container logs too.
+  debug: process.env.PAYLOAD_DEBUG === 'true',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -114,4 +120,17 @@ export default buildConfig({
   cors: [serverURL],
   csrf: [serverURL],
   sharp,
+  hooks: {
+    afterError: [
+      async ({ error, req }) => {
+        // Always log the real cause; browser only sees "Something went wrong." when debug=false.
+        console.error('[payload:afterError]', {
+          message: error?.message,
+          name: error?.name,
+          stack: error?.stack,
+          path: req?.pathname ?? req?.url,
+        })
+      },
+    ],
+  },
 })

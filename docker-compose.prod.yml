@@ -40,6 +40,8 @@ services:
       # Ignored for schema in production (Payload never pushes when NODE_ENV=production).
       # Schema: prodMigrations in payload.config.ts + src/migrations/*
       PAYLOAD_DATABASE_PUSH: ${PAYLOAD_DATABASE_PUSH:-false}
+      # Set true temporarily to expose real login/API error messages in JSON responses
+      PAYLOAD_DEBUG: ${PAYLOAD_DEBUG:-false}
     depends_on:
       db:
         condition: service_healthy
