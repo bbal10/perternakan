@@ -1,6 +1,14 @@
 # Usage:
-#   docker compose -f docker-compose.prod.yml --env-file .env.production.local up -d --build
-# Interpolation (${VAR}) still needs --env-file (or a .env next to this file).
+#   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+#
+# .env MUST define matching DB credentials:
+#   POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB  → used by Postgres container
+#   DATABASE_URI → used by the app (host MUST be "db", not localhost)
+# Example:
+#   DATABASE_URI=postgresql://postgres:postgres@db:5432/perternakan
+#
+# Special chars in password must be URL-encoded in DATABASE_URI only
+# (e.g. @ → %40, # → %23, = → %3D). Prefer alphanumeric passwords.
 
 services:
   db:
@@ -14,7 +22,8 @@ services:
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      # pg_isready does NOT verify password — only that Postgres accepts connections
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-perternakan}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,14 +43,14 @@ services:
     environment:
       NODE_ENV: production
       PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET min 32 chars}
-      # Host "db" = compose service name (not localhost)
-      DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-perternakan}
+      # Prefer explicit DATABASE_URI from env (avoids compose URL-mangling of passwords)
+      DATABASE_URI: ${DATABASE_URI:?set DATABASE_URI e.g. postgresql://USER:PASS@db:5432/DB}
       NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://perternakan.alqashwa.co.id}
       # Ignored for schema in production (Payload never pushes when NODE_ENV=production).
       # Schema: prodMigrations in payload.config.ts + src/migrations/*
       PAYLOAD_DATABASE_PUSH: ${PAYLOAD_DATABASE_PUSH:-false}
       # Set true temporarily to expose real login/API error messages in JSON responses
-      PAYLOAD_DEBUG: ${PAYLOAD_DEBUG:-false}
+      PAYLOAD_DEBUG: ${PAYLOAD_DEBUG:-true}
     depends_on:
       db:
         condition: service_healthy
