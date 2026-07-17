@@ -1,3 +1,7 @@
+# Usage:
+#   docker compose -f docker-compose.prod.yml --env-file .env.production.local up -d --build
+# Interpolation (${VAR}) still needs --env-file (or a .env next to this file).
+
 services:
   db:
     image: postgres:16-alpine
@@ -6,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-perternakan}
-    # HAPUS bagian 'ports' di sini agar DB tidak terekspos ke publik (lebih aman)
+    # No host ports — DB only on internal networks (safer)
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     healthcheck:
@@ -16,7 +20,7 @@ services:
       retries: 5
     networks:
       - internal_perternakan
-      - alqoswah_network # <--- TAMBAHKAN: Agar bisa diakses Caddy
+      - alqoswah_network
 
   app:
     build:
@@ -25,13 +29,15 @@ services:
       args:
         NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://perternakan.alqashwa.co.id}
     restart: always
-    expose: # <--- UBAH dari 'ports' menjadi 'expose'
+    expose:
       - "3000"
     environment:
       NODE_ENV: production
       PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET min 32 chars}
+      # Host "db" = compose service name (not localhost)
       DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-perternakan}
-      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://perternakan.alqashwa.co.id} # <--- Pastikan ini URL publik HTTPS
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://perternakan.alqashwa.co.id}
+      # false after first bootstrap; true only while tables are missing
       PAYLOAD_DATABASE_PUSH: ${PAYLOAD_DATABASE_PUSH:-false}
     depends_on:
       db:
@@ -40,7 +46,7 @@ services:
       - media_uploads:/app/media
     networks:
       - internal_perternakan
-      - alqoswah_network # <--- TAMBAHKAN: Agar bisa diakses Caddy
+      - alqoswah_network
 
 volumes:
   postgres_data_prod:
