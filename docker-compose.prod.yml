@@ -1,14 +1,14 @@
 # Usage:
 #   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 #
-# .env MUST define matching DB credentials:
-#   POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB  → used by Postgres container
-#   DATABASE_URI → used by the app (host MUST be "db", not localhost)
-# Example:
-#   DATABASE_URI=postgresql://postgres:postgres@db:5432/perternakan
+# Required in env file:
+#   POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+#   PAYLOAD_SECRET (>= 32 chars)
+#   NEXT_PUBLIC_SERVER_URL (public HTTPS URL, no trailing slash)
 #
-# Special chars in password must be URL-encoded in DATABASE_URI only
-# (e.g. @ → %40, # → %23, = → %3D). Prefer alphanumeric passwords.
+# DATABASE_URI is built with a UNIQUE hostname (perternakan-db) so the app
+# never resolves another project's service named "db" on the shared Caddy network.
+# That shared-network DNS clash is a common cause of "password authentication failed".
 
 services:
   db:
@@ -18,18 +18,19 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-perternakan}
-    # No host ports — DB only on internal networks (safer)
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     healthcheck:
-      # pg_isready does NOT verify password — only that Postgres accepts connections
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-perternakan}"]
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 10s
       timeout: 5s
       retries: 5
+    # DB stays on the private project network only — do NOT attach to the
+    # shared Caddy network, or hostname resolution can hit the wrong Postgres.
     networks:
-      - internal_perternakan
-      - alqoswah_network
+      internal_perternakan:
+        aliases:
+          - perternakan-db
 
   app:
     build:
@@ -43,14 +44,10 @@ services:
     environment:
       NODE_ENV: production
       PAYLOAD_SECRET: ${PAYLOAD_SECRET:?set PAYLOAD_SECRET min 32 chars}
-      # Prefer explicit DATABASE_URI from env (avoids compose URL-mangling of passwords)
-      DATABASE_URI: ${DATABASE_URI:?set DATABASE_URI e.g. postgresql://USER:PASS@db:5432/DB}
+      DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@perternakan-db:5432/${POSTGRES_DB:-perternakan}
       NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://perternakan.alqashwa.co.id}
-      # Ignored for schema in production (Payload never pushes when NODE_ENV=production).
-      # Schema: prodMigrations in payload.config.ts + src/migrations/*
       PAYLOAD_DATABASE_PUSH: ${PAYLOAD_DATABASE_PUSH:-false}
-      # Set true temporarily to expose real login/API error messages in JSON responses
-      PAYLOAD_DEBUG: ${PAYLOAD_DEBUG:-true}
+      PAYLOAD_DEBUG: ${PAYLOAD_DEBUG:-false}
     depends_on:
       db:
         condition: service_healthy
@@ -69,4 +66,4 @@ networks:
     driver: bridge
   alqoswah_network:
     external: true
-    name: alqoswah-dashboard_internal # <--- PASTIKAN nama ini sama persis dengan network di project lama
+    name: alqoswah-dashboard_internal
