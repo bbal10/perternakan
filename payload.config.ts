@@ -14,6 +14,7 @@ import { Media } from './src/collections/Media'
 import { Users } from './src/collections/Users'
 import { ExportJobs } from './src/collections/ExportJobs'
 import { exportDataTask } from './src/jobs/exportData'
+import { migrations } from './src/migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -21,7 +22,9 @@ const dirname = path.dirname(filename)
 const isProd = process.env.NODE_ENV === 'production'
 const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
-// Explicit override wins; otherwise push only outside production.
+// Dev-only: drizzle push when NODE_ENV !== 'production'.
+// Payload hardcodes push OFF in production regardless of this flag
+// (see @payloadcms/db-postgres connect.js). Production uses prodMigrations.
 const databasePush =
   process.env.PAYLOAD_DATABASE_PUSH !== undefined
     ? process.env.PAYLOAD_DATABASE_PUSH === 'true'
@@ -97,8 +100,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
-    // Dev: push schema. Prod: migrations only (set PAYLOAD_DATABASE_PUSH=true only for emergency bootstrap).
+    // Dev: drizzle push (ignored when NODE_ENV=production).
     push: databasePush,
+    // Prod: run pending migrations on Payload init (empty DB first boot).
+    prodMigrations: migrations,
     migrationDir: path.resolve(dirname, 'src/migrations'),
   }),
   secret: payloadSecret || 'dev-only-secret-change-me-min-32-chars!!',

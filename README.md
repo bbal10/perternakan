@@ -28,7 +28,7 @@ Aplikasi web manajemen peternakan itik menggunakan **Next.js + Payload CMS**.
 | Compose file | `docker-compose.yml` | `docker-compose.prod.yml` |
 | Env file | `.env.local` | `.env.production.local` |
 | `NODE_ENV` | `development` | `production` |
-| Schema DB | **push** (`PAYLOAD_DATABASE_PUSH=true`) — tabel ikut berubah otomatis | **migrations** (`PAYLOAD_DATABASE_PUSH=false`) |
+| Schema DB | **push** (drizzle) saat `NODE_ENV≠production` | **`prodMigrations`** di `payload.config.ts` (auto-run saat init) |
 | Source code | Bind-mount + hot reload | Baked into image |
 | Secrets | Dev placeholder OK | Wajib secret kuat (≥32 char) |
 | Seed data | Boleh (`POST /api/seed`) | Diblokir |
@@ -40,11 +40,18 @@ Development
   collections berubah → app start → drizzle push → tabel sinkron
 
 Production
-  collections berubah → buat migration → deploy → jalankan migration → app start
+  collections berubah → buat migration file di src/migrations/ → deploy image
+  → app start (NODE_ENV=production) → prodMigrations auto-run → tabel siap
 ```
 
-Folder migration: `src/migrations/`  
-(CLI `payload migrate` masih bisa gagal di beberapa setup Node/tsx + Lexical; di dev andalkan push.)
+**Penting:** di Payload 3, `push` **tidak pernah** dijalankan jika `NODE_ENV=production`
+(hardcoded di `@payloadcms/db-postgres`). `PAYLOAD_DATABASE_PUSH=true` **tidak**
+membuat tabel di production. Gunakan `prodMigrations` (sudah di-wire di `payload.config.ts`).
+
+Folder migration: `src/migrations/` (+ `index.ts` di-export ke `prodMigrations`).
+
+CLI `payload migrate:create` bisa gagal di Node 23+/tsx + Lexical; alternatif dev:
+init Payload dengan `NODE_ENV=development` lalu panggil `payload.db.createMigration(...)`.
 
 ---
 
@@ -118,15 +125,17 @@ Jangan commit `.env.production.local`.
 ### 2. Docker / Podman (prod stack)
 
 ```bash
+# WAJIB --env-file agar ${POSTGRES_*} / PAYLOAD_SECRET ter-interpolate
 npm run docker:prod
 # setara:
-# podman compose -f docker-compose.prod.yml --env-file .env.production.local up --build -d
+# docker compose -f docker-compose.prod.yml --env-file .env.production.local up --build -d
 ```
 
 - Image dibuild dari `Dockerfile` (multi-stage, `npm run build` + `npm start`)
 - Tidak ada bind-mount source
 - Upload media di volume `media_uploads`
 - DB di volume `postgres_data_prod`
+- Schema: migration `20260717_051020_initial` dijalankan otomatis lewat `prodMigrations`
 
 Stop:
 
@@ -150,9 +159,12 @@ npm start
 
 ### 4. Bootstrap DB kosong di production
 
-**Disarankan:** buat & jalankan migration Payload (`src/migrations`).
+Cukup deploy image yang menyertakan `src/migrations` + `prodMigrations` di config.
+Saat app start pertama kali, Payload menjalankan migration pending → tabel `users` dll. terbentuk.
 
-**Darurat (sekali saja):** set `PAYLOAD_DATABASE_PUSH=true` saat start pertama, biarkan schema terbentuk, lalu kembalikan ke `false` dan deploy ulang. Jangan biarkan push menyala di production jangka panjang.
+Jika volume Postgres punya password lama yang tidak cocok env, hapus volume
+`*_postgres_data_prod` (data hilang) lalu `up` ulang — `POSTGRES_PASSWORD` hanya
+dibaca saat volume **baru**.
 
 ---
 

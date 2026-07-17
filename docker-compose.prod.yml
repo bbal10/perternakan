@@ -37,7 +37,8 @@ services:
       # Host "db" = compose service name (not localhost)
       DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-perternakan}
       NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://perternakan.alqashwa.co.id}
-      # false after first bootstrap; true only while tables are missing
+      # Ignored for schema in production (Payload never pushes when NODE_ENV=production).
+      # Schema: prodMigrations in payload.config.ts + src/migrations/*
       PAYLOAD_DATABASE_PUSH: ${PAYLOAD_DATABASE_PUSH:-false}
     depends_on:
       db:
